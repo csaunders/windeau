@@ -10,6 +10,10 @@ type Drawable interface {
 	Draw()
 }
 
+type BindingBox interface {
+	WithinBox(x, y int) bool
+}
+
 type DataSource interface {
 	Entries() []string
 	Position() int

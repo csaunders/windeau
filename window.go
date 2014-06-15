@@ -1,6 +1,8 @@
 package windeau
 
-import "github.com/nsf/termbox-go"
+import (
+	"github.com/nsf/termbox-go"
+)
 
 type SimpleBorder struct {
 	edge, verticalBorder, horizontalBorder rune
@@ -40,9 +42,23 @@ type Window struct {
 	Fg, Bg        termbox.Attribute
 }
 
+func MakeBasicWindow(x, y, w, h int) *Window {
+	border := MakeSimpleBorder('+', '|', '-')
+	return &Window{X: x, Y: y, Width: w, Height: h, Border: border}
+}
+
 func (w *Window) Draw() {
 	w.drawBorder()
 	w.drawTitle()
+}
+
+func (w *Window) WithinBox(x, y int) bool {
+	if x >= w.X && x < w.X+w.Width {
+		if y >= w.Y && y < w.Y+w.Height {
+			return true
+		}
+	}
+	return false
 }
 
 func (w *Window) drawBorder() {

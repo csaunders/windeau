@@ -3,26 +3,30 @@ package main
 import (
 	"github.com/csaunders/windeau"
 	"github.com/nsf/termbox-go"
+	"os"
 )
+
+var window, fancyWindow *windeau.Window
+var focusableWindow *windeau.FocusableWindow
 
 func main() {
 	termbox.Init()
-	termbox.Clear(termbox.ColorGreen, termbox.ColorBlack)
 	defer termbox.Close()
+	termbox.SetInputMode(termbox.InputMouse)
 
-	border := windeau.MakeSimpleBorder('+', '|', '-')
-	window := &windeau.Window{X: 0, Y: 0, Width: 30, Height: 25, Fg: termbox.ColorGreen, Bg: termbox.ColorDefault, Border: border}
-	window.Title = "Hello World"
-	window.Draw()
+	prepareWindows()
 
-	fancyBorder := FancyBorder{TopLeft: '┏', TopRight: '┓', BottomLeft: '┗', BottomRight: '┛', Vertical: '┃', Horizontal: '━'}
-	fancyWindow := &windeau.Window{X: 40, Y: 20, Width: 40, Height: 30, Fg: termbox.ColorBlue, Bg: termbox.ColorDefault, Border: fancyBorder}
-	fancyWindow.Title = "Fancy Window"
-	fancyWindow.Draw()
-
-	termbox.Flush()
-
-	termbox.PollEvent()
+	for true {
+		draw()
+		switch event := termbox.PollEvent(); event.Type {
+		case termbox.EventMouse:
+			handleMouse(&event)
+		case termbox.EventKey:
+			if event.Key == termbox.KeyEsc {
+				os.Exit(0)
+			}
+		}
+	}
 }
 
 type FancyBorder struct {
@@ -51,4 +55,32 @@ func (f FancyBorder) VerticalBorder() rune {
 
 func (f FancyBorder) HorizontalBorder() rune {
 	return f.Horizontal
+}
+
+func draw() {
+	termbox.Clear(termbox.ColorGreen, termbox.ColorBlack)
+	window.Draw()
+	fancyWindow.Draw()
+	focusableWindow.Draw()
+	termbox.Flush()
+}
+
+func handleMouse(ev *termbox.Event) {
+	focusableWindow.WithinBox(ev.MouseX, ev.MouseY)
+}
+
+func prepareWindows() {
+	border := windeau.MakeSimpleBorder('+', '|', '-')
+	window = &windeau.Window{X: 0, Y: 0, Width: 30, Height: 25, Fg: termbox.ColorGreen, Bg: termbox.ColorDefault, Border: border}
+	window.Title = "Hello World"
+	window.Draw()
+
+	fancyBorder := FancyBorder{TopLeft: '┏', TopRight: '┓', BottomLeft: '┗', BottomRight: '┛', Vertical: '┃', Horizontal: '━'}
+	fancyWindow = &windeau.Window{X: 40, Y: 20, Width: 40, Height: 30, Fg: termbox.ColorBlue, Bg: termbox.ColorDefault, Border: fancyBorder}
+	fancyWindow.Title = "Fancy Window"
+
+	underlyingWindow := &windeau.Window{X: 40, Y: 0, Width: 15, Height: 15, Border: border}
+	focusColor := windeau.WindowState{FgColor: termbox.ColorGreen, BgColor: termbox.ColorDefault}
+	unfocusColor := windeau.WindowState{FgColor: termbox.ColorWhite, BgColor: termbox.ColorBlack}
+	focusableWindow = &windeau.FocusableWindow{WindowImpl: underlyingWindow, FocusOn: focusColor, FocusOff: unfocusColor, Focused: false}
 }
