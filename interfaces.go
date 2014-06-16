@@ -7,11 +7,11 @@ type WindowBorder interface {
 }
 
 type Drawable interface {
-	Draw()
-}
-
-type BindingBox interface {
+	SetParent(parent Drawable)
+	IsRoot() bool
+	GetRect() Rect
 	WithinBox(x, y int) bool
+	Draw()
 }
 
 type DataSource interface {

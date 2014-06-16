@@ -40,6 +40,7 @@ type Window struct {
 	Border        WindowBorder
 	Title         string
 	Fg, Bg        termbox.Attribute
+	View          *Drawable
 }
 
 func MakeBasicWindow(x, y, w, h int) *Window {
@@ -50,15 +51,23 @@ func MakeBasicWindow(x, y, w, h int) *Window {
 func (w *Window) Draw() {
 	w.drawBorder()
 	w.drawTitle()
+	if w.View != nil {
+		(*w.View).Draw()
+	}
+}
+
+func (w *Window) SetParent(parent Drawable) {}
+
+func (w *Window) IsRoot() bool {
+	return true
+}
+
+func (w *Window) GetRect() Rect {
+	return Rect{X: w.X, Y: w.Y, Width: w.Width, Height: w.Height}
 }
 
 func (w *Window) WithinBox(x, y int) bool {
-	if x >= w.X && x < w.X+w.Width {
-		if y >= w.Y && y < w.Y+w.Height {
-			return true
-		}
-	}
-	return false
+	return w.GetRect().WithinRect(x, y)
 }
 
 func (w *Window) drawBorder() {

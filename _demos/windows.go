@@ -82,5 +82,6 @@ func prepareWindows() {
 	underlyingWindow := &windeau.Window{X: 40, Y: 0, Width: 15, Height: 15, Border: border}
 	focusColor := windeau.WindowState{FgColor: termbox.ColorGreen, BgColor: termbox.ColorDefault}
 	unfocusColor := windeau.WindowState{FgColor: termbox.ColorWhite, BgColor: termbox.ColorBlack}
-	focusableWindow = &windeau.FocusableWindow{WindowImpl: underlyingWindow, FocusOn: focusColor, FocusOff: unfocusColor, Focused: false}
+	focusableWindow = &windeau.FocusableWindow{FocusOn: focusColor, FocusOff: unfocusColor, Focused: false}
+	focusableWindow.SetParent(underlyingWindow)
 }

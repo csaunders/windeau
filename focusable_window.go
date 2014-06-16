@@ -8,7 +8,7 @@ type WindowState struct {
 }
 
 type FocusableWindow struct {
-	WindowImpl        *Window
+	Parent            *Window
 	FocusOn, FocusOff WindowState
 	Focused           bool
 }
@@ -19,20 +19,35 @@ func (c *FocusableWindow) ToggleFocus() {
 
 func (c *FocusableWindow) Draw() {
 	c.setColors()
-	c.WindowImpl.Draw()
+	c.Parent.Draw()
+}
+
+func (c *FocusableWindow) SetParent(parent Drawable) {
+	window, ok := parent.(*Window)
+	if ok {
+		c.Parent = window
+	}
+}
+
+func (c *FocusableWindow) IsRoot() bool {
+	return false
+}
+
+func (c *FocusableWindow) GetRect() Rect {
+	return c.Parent.GetRect()
 }
 
 func (c *FocusableWindow) WithinBox(x, y int) bool {
-	c.Focused = c.WindowImpl.WithinBox(x, y)
+	c.Focused = c.Parent.WithinBox(x, y)
 	return c.Focused
 }
 
 func (c *FocusableWindow) setColors() {
 	if c.Focused {
-		c.WindowImpl.Fg = c.FocusOn.FgColor
-		c.WindowImpl.Bg = c.FocusOn.BgColor
+		c.Parent.Fg = c.FocusOn.FgColor
+		c.Parent.Bg = c.FocusOn.BgColor
 	} else {
-		c.WindowImpl.Fg = c.FocusOff.FgColor
-		c.WindowImpl.Bg = c.FocusOff.BgColor
+		c.Parent.Fg = c.FocusOff.FgColor
+		c.Parent.Bg = c.FocusOff.BgColor
 	}
 }
