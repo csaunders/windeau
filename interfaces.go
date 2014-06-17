@@ -1,5 +1,10 @@
 package windeau
 
+import (
+	"fmt"
+	"github.com/nsf/termbox-go"
+)
+
 type WindowBorder interface {
 	Edge(x, y int, window Window) rune
 	VerticalBorder() rune
@@ -9,17 +14,24 @@ type WindowBorder interface {
 type Drawable interface {
 	SetParent(parent Drawable)
 	IsRoot() bool
+	IsFocused() bool
 	GetRect() Rect
 	WithinBox(x, y int) bool
 	Draw()
 }
 
 type DataSource interface {
-	Entries() []string
-	Position() int
+	GetEntries() []fmt.Stringer
+	GetPosition() int
+}
+
+type Event struct {
+	termbox.Event
 }
 
 type EventHandler interface {
-	OnHighlight(context interface{})
-	OnSelect(context interface{})
+	OnFocus(context Event)
+	OnUnfocus(context Event)
+	OnHighlight(context Event)
+	OnSelect(context Event)
 }
