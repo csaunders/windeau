@@ -8,14 +8,19 @@ func RunLoop(callbacks map[string]func(ev *termbox.Event)) {
 	termbox.Init()
 	defer termbox.Close()
 	termbox.SetInputMode(termbox.InputMouse)
+
+	draw := func() {
+		callbacks["draw"](nil)
+		termbox.Flush()
+	}
+
 	if setup := callbacks["setup"]; setup != nil {
 		setup(nil)
+		draw()
 	}
 
 	for true {
 		termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
-		callbacks["draw"](nil)
-		termbox.Flush()
 
 		event := termbox.PollEvent()
 		switch {
@@ -24,6 +29,7 @@ func RunLoop(callbacks map[string]func(ev *termbox.Event)) {
 		default:
 			callbacks["update"](&event)
 		}
+		draw()
 	}
 
 	if teardown := callbacks["teardown"]; teardown != nil {

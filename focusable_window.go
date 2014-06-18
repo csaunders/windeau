@@ -51,12 +51,15 @@ func (c *FocusableWindow) WithinBox(x, y int) bool {
 	return c.Focused
 }
 
-func (c *FocusableWindow) setColors() {
+func (c *FocusableWindow) ActiveColors() WindowState {
 	if c.Focused {
-		c.Parent.Fg = c.FocusOn.FgColor
-		c.Parent.Bg = c.FocusOn.BgColor
+		return c.FocusOn
 	} else {
-		c.Parent.Fg = c.FocusOff.FgColor
-		c.Parent.Bg = c.FocusOff.BgColor
+		return c.FocusOff
 	}
+}
+
+func (c *FocusableWindow) setColors() {
+	c.Parent.Fg = c.ActiveColors().FgColor
+	c.Parent.Bg = c.ActiveColors().BgColor
 }

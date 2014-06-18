@@ -4,6 +4,11 @@ import (
 	"github.com/nsf/termbox-go"
 )
 
+const (
+	SVMoreUp   string = "/\\more/\\"
+	SVMoreDown string = "\\/more\\/"
+)
+
 type Scrollview struct {
 	Parent          *FocusableWindow
 	Entries         []string
@@ -48,6 +53,13 @@ func (s *Scrollview) GetPosition() int {
 	return s.Position
 }
 
+func (s *Scrollview) SetPosition(position int) int {
+	if position >= 0 && position < len(s.GetEntries()) {
+		s.Position = position
+	}
+	return s.Position
+}
+
 func (s *Scrollview) SetHandler(handler EventHandler) {
 	s.Handler = handler
 }
@@ -59,22 +71,54 @@ func (s *Scrollview) Draw() {
 	s.Parent.Draw()
 	rect := s.GetRect()
 	for i := 0; i < s.visibleRowCount; i++ {
+		entry := i + s.startingPosition()
 		if i >= len(s.GetEntries()) {
 			break
 		}
 		fg, bg := termbox.ColorWhite, termbox.ColorDefault
-		if s.Position == i {
+		if s.Position == entry && s.IsFocused() {
 			bg = termbox.ColorBlue
 		}
 
 		x := rect.X
 		y := rect.Y + i
-		message := s.GetEntries()[i]
+		message := s.GetEntries()[entry]
 		DrawStringWithinSize(message, x, y, rect.Width, fg, bg)
+	}
+	s.hintMoreDataExists()
+}
+
+func (s *Scrollview) startingPosition() int {
+	halfway := s.visibleRowCount / 2
+	numberOfEntries := len(s.GetEntries())
+	switch {
+	case numberOfEntries < s.visibleRowCount:
+		return 0
+	case s.Position < s.visibleRowCount:
+		return 0
+	case s.Position >= numberOfEntries-s.visibleRowCount:
+		return numberOfEntries - s.visibleRowCount
+	default:
+		return s.Position - halfway
 	}
 }
 
 func (s *Scrollview) determineVisibleRowCount() {
 	bindingBox := s.GetRect()
 	s.visibleRowCount = bindingBox.Height - 1
+}
+
+func (s *Scrollview) hintMoreDataExists() {
+	if len(s.GetEntries()) < s.visibleRowCount {
+		return
+	}
+	parentRect := s.Parent.GetRect()
+	colors := s.Parent.ActiveColors()
+	leftEdge := parentRect.X + parentRect.Width - 2
+	if s.Position >= s.visibleRowCount {
+		DrawStringWithinSize(SVMoreUp, leftEdge-len(SVMoreUp), parentRect.Y, parentRect.Width-2, colors.FgColor, colors.BgColor)
+	}
+	if s.Position < len(s.GetEntries())-s.visibleRowCount {
+		DrawStringWithinSize(SVMoreDown, leftEdge-len(SVMoreDown), parentRect.Y+parentRect.Height-1, parentRect.Width-2, colors.FgColor, colors.BgColor)
+	}
 }
