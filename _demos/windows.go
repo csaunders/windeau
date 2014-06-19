@@ -8,6 +8,7 @@ import (
 
 var window, fancyWindow *windeau.Window
 var focusableWindow *windeau.FocusableWindow
+var canvas *windeau.Canvas
 
 func main() {
 	termbox.Init()
@@ -62,6 +63,7 @@ func draw() {
 	window.Draw()
 	fancyWindow.Draw()
 	focusableWindow.Draw()
+	canvas.Draw()
 	termbox.Flush()
 }
 
@@ -84,4 +86,9 @@ func prepareWindows() {
 	unfocusColor := windeau.WindowState{FgColor: termbox.ColorWhite, BgColor: termbox.ColorBlack}
 	focusableWindow = &windeau.FocusableWindow{FocusOn: focusColor, FocusOff: unfocusColor, Focused: false}
 	focusableWindow.SetParent(underlyingWindow)
+
+	canvas = windeau.MakeCanvas(70, 5, 10, 10)
+	canvas.Fill('x', termbox.ColorYellow, termbox.ColorYellow)
+	canvas.FilledRect('y', termbox.ColorBlack, termbox.ColorYellow, windeau.Rect{75, 7, 3, 3})
+	canvas.FilledRect('z', termbox.ColorBlue, termbox.ColorDefault, windeau.Rect{72, 12, 2, 3})
 }
