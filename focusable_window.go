@@ -34,6 +34,10 @@ func (c *FocusableWindow) SetParent(parent Drawable) {
 	}
 }
 
+func (c *FocusableWindow) GetColors() (termbox.Attribute, termbox.Attribute) {
+	return c.Parent.GetColors()
+}
+
 func (c *FocusableWindow) IsRoot() bool {
 	return false
 }
@@ -51,15 +55,11 @@ func (c *FocusableWindow) WithinBox(x, y int) bool {
 	return c.Focused
 }
 
-func (c *FocusableWindow) ActiveColors() WindowState {
-	if c.Focused {
-		return c.FocusOn
-	} else {
-		return c.FocusOff
-	}
-}
-
 func (c *FocusableWindow) setColors() {
-	c.Parent.Fg = c.ActiveColors().FgColor
-	c.Parent.Bg = c.ActiveColors().BgColor
+	color := c.FocusOff
+	if c.Focused {
+		color = c.FocusOn
+	}
+	c.Parent.Fg = color.FgColor
+	c.Parent.Bg = color.BgColor
 }

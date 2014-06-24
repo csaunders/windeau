@@ -13,6 +13,7 @@ type WindowBorder interface {
 
 type Drawable interface {
 	SetParent(parent Drawable)
+	GetColors() (fg, bg termbox.Attribute)
 	IsRoot() bool
 	IsFocused() bool
 	GetRect() Rect

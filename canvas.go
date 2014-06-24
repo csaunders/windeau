@@ -13,7 +13,7 @@ var BlankCell Cell = Cell{' ', termbox.ColorDefault, termbox.ColorDefault}
 
 type Canvas struct {
 	X, Y, Width, Height int
-	Parent              *Drawable
+	Parent              Drawable
 	cells               [][]Cell
 }
 
@@ -24,7 +24,11 @@ func MakeCanvas(x, y, w, h int) *Canvas {
 }
 
 func (c *Canvas) GetRect() Rect {
-	return Rect{c.X, c.Y, c.Width, c.Height}
+	if c.Parent != nil {
+		return c.Parent.GetRect().ShrinkBy(1)
+	} else {
+		return Rect{c.X, c.Y, c.Width, c.Height}
+	}
 }
 
 func (c *Canvas) Fill(char rune, fg, bg termbox.Attribute) {
@@ -50,10 +54,28 @@ func (c *Canvas) MarkCell(x, y int, char rune, fg, bg termbox.Attribute) {
 	c.cells[x][y] = Cell{char, fg, bg}
 }
 
+func (c *Canvas) DrawString(x, y int, s string, fg, bg termbox.Attribute) {
+	runes := ConvertToRuneArray(s)
+	width := c.Width - x
+	if y > c.Height || y < 0 {
+		return
+	}
+
+	for i := 0; i < width && i < len(runes); i++ {
+		c.MarkCell(i+x, y, runes[i], fg, bg)
+	}
+}
+
 func (c *Canvas) Draw() {
+	rect := c.GetRect()
 	for x, row := range c.cells {
 		for y, cell := range row {
-			termbox.SetCell(x+c.X, y+c.Y, cell.Char, cell.Fg, cell.Bg)
+			px := x + rect.X
+			py := y + rect.Y
+
+			if rect.WithinRect(px, py) && px < rect.X+rect.Width-1 && py < rect.Y+rect.Height-1 {
+				termbox.SetCell(px, py, cell.Char, cell.Fg, cell.Bg)
+			}
 		}
 	}
 }

@@ -7,7 +7,18 @@ func DrawString(s string, x, y int, fg, bg termbox.Attribute) {
 }
 
 func DrawStringWithinSize(s string, x, y, width int, fg, bg termbox.Attribute) {
-	for px := 0; px < width && px < len(s); px++ {
-		termbox.SetCell(x+px, y, rune(s[px]), fg, bg)
+	for px, char := range ConvertToRuneArray(s) {
+		if px >= width {
+			break
+		}
+		termbox.SetCell(x+px, y, char, fg, bg)
 	}
+}
+
+func ConvertToRuneArray(s string) []rune {
+	runes := make([]rune, len(s))
+	for px := 0; px < len(s) && px < len(s); px++ {
+		runes[px] = rune(s[px])
+	}
+	return runes
 }

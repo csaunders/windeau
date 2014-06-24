@@ -10,7 +10,7 @@ const (
 )
 
 type Scrollview struct {
-	Parent          *FocusableWindow
+	Parent          Drawable
 	Entries         []string
 	Position        int
 	Handler         EventHandler
@@ -23,7 +23,7 @@ func MakeScrollview(parent *FocusableWindow, entries []string, handler EventHand
 	return scrollview
 }
 
-func (s *Scrollview) SetParent(parent *FocusableWindow) {
+func (s *Scrollview) SetParent(parent Drawable) {
 	s.Parent = parent
 	s.determineVisibleRowCount()
 }
@@ -37,8 +37,7 @@ func (s *Scrollview) IsFocused() bool {
 }
 
 func (s *Scrollview) GetRect() Rect {
-	parentRect := s.Parent.GetRect()
-	return Rect{parentRect.X + 1, parentRect.Y + 1, parentRect.Width - 1, parentRect.Height - 1}
+	return s.Parent.GetRect().ShrinkBy(1)
 }
 
 func (s *Scrollview) WithinBox(x, y int) bool {
@@ -113,12 +112,12 @@ func (s *Scrollview) hintMoreDataExists() {
 		return
 	}
 	parentRect := s.Parent.GetRect()
-	colors := s.Parent.ActiveColors()
+	fg, bg := s.Parent.GetColors()
 	leftEdge := parentRect.X + parentRect.Width - 2
 	if s.Position >= s.visibleRowCount {
-		DrawStringWithinSize(SVMoreUp, leftEdge-len(SVMoreUp), parentRect.Y, parentRect.Width-2, colors.FgColor, colors.BgColor)
+		DrawStringWithinSize(SVMoreUp, leftEdge-len(SVMoreUp), parentRect.Y, parentRect.Width-2, fg, bg)
 	}
 	if s.Position < len(s.GetEntries())-s.visibleRowCount {
-		DrawStringWithinSize(SVMoreDown, leftEdge-len(SVMoreDown), parentRect.Y+parentRect.Height-1, parentRect.Width-2, colors.FgColor, colors.BgColor)
+		DrawStringWithinSize(SVMoreDown, leftEdge-len(SVMoreDown), parentRect.Y+parentRect.Height-1, parentRect.Width-2, fg, bg)
 	}
 }

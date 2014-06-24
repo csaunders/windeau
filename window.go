@@ -58,6 +58,10 @@ func (w *Window) Draw() {
 
 func (w *Window) SetParent(parent Drawable) {}
 
+func (w *Window) GetColors() (termbox.Attribute, termbox.Attribute) {
+	return w.Fg, w.Bg
+}
+
 func (w *Window) IsRoot() bool {
 	return true
 }

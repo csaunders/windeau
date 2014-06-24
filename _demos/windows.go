@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/csaunders/windeau"
 	"github.com/nsf/termbox-go"
-	"os"
 )
 
 var window, fancyWindow *windeau.Window
@@ -11,20 +10,21 @@ var focusableWindow *windeau.FocusableWindow
 var canvas *windeau.Canvas
 
 func main() {
+	running := true
 	termbox.Init()
 	defer termbox.Close()
 	termbox.SetInputMode(termbox.InputMouse)
 
 	prepareWindows()
 
-	for true {
+	for running {
 		draw()
 		switch event := termbox.PollEvent(); event.Type {
 		case termbox.EventMouse:
 			handleMouse(&event)
 		case termbox.EventKey:
 			if event.Key == termbox.KeyEsc {
-				os.Exit(0)
+				running = false
 			}
 		}
 	}
@@ -91,8 +91,10 @@ func prepareWindows() {
 	focusableWindow = &windeau.FocusableWindow{FocusOn: focusColor, FocusOff: unfocusColor, Focused: false}
 	focusableWindow.SetParent(underlyingWindow)
 
-	canvas = windeau.MakeCanvas(70, 5, 10, 10)
+	canvas = windeau.MakeCanvas(70, 5, 20, 20)
 	canvas.Fill('x', termbox.ColorYellow, termbox.ColorYellow)
 	canvas.FilledRect('y', termbox.ColorBlack, termbox.ColorYellow, windeau.Rect{75, 7, 3, 3})
 	canvas.FilledRect('z', termbox.ColorBlue, termbox.ColorDefault, windeau.Rect{72, 12, 2, 3})
+	canvas.DrawString(0, 8, "Hello", termbox.ColorBlack, termbox.ColorYellow)
+	canvas.Parent = focusableWindow
 }

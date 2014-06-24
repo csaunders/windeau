@@ -5,12 +5,7 @@ type Rect struct {
 }
 
 func (r Rect) WithinRect(x, y int) bool {
-	if x >= r.X && x < r.X+r.Width {
-		if y >= r.Y && y < r.Y+r.Height {
-			return true
-		}
-	}
-	return false
+	return x >= r.X && x < r.X+r.Width && y >= r.Y && y < r.Y+r.Height
 }
 
 func (r Rect) Contains(other Rect) bool {
@@ -24,4 +19,8 @@ func (r Rect) Contains(other Rect) bool {
 
 func (r Rect) DoesNotContain(other Rect) bool {
 	return !r.Contains(other)
+}
+
+func (r Rect) ShrinkBy(amount int) Rect {
+	return Rect{r.X + amount, r.Y + amount, r.Width - amount, r.Height - amount}
 }
