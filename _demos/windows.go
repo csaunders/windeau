@@ -68,7 +68,11 @@ func draw() {
 }
 
 func handleMouse(ev *termbox.Event) {
-	focusableWindow.WithinBox(ev.MouseX, ev.MouseY)
+	if focusableWindow.WithinBox(ev.MouseX, ev.MouseY) == false {
+		canvas.X = ev.MouseX
+		canvas.Y = ev.MouseY
+	}
+
 }
 
 func prepareWindows() {

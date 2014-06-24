@@ -41,9 +41,13 @@ func (c *Canvas) FilledRect(char rune, fg, bg termbox.Attribute, rect Rect) {
 
 	for i := 0; i < rect.Width; i++ {
 		for j := 0; j < rect.Height; j++ {
-			c.cells[i+offsetX][j+offsetY] = Cell{char, fg, bg}
+			c.MarkCell(i+offsetX, j+offsetY, char, fg, bg)
 		}
 	}
+}
+
+func (c *Canvas) MarkCell(x, y int, char rune, fg, bg termbox.Attribute) {
+	c.cells[x][y] = Cell{char, fg, bg}
 }
 
 func (c *Canvas) Draw() {
