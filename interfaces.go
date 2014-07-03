@@ -16,6 +16,7 @@ type Drawable interface {
 	GetColors() (fg, bg termbox.Attribute)
 	IsRoot() bool
 	IsFocused() bool
+	SetFocused(focused bool)
 	GetRect() Rect
 	WithinBox(x, y int) bool
 	Draw()

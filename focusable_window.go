@@ -46,6 +46,10 @@ func (c *FocusableWindow) IsFocused() bool {
 	return c.Focused
 }
 
+func (c *FocusableWindow) SetFocused(focused bool) {
+	c.Focused = focused
+}
+
 func (c *FocusableWindow) GetRect() Rect {
 	return c.Parent.GetRect()
 }

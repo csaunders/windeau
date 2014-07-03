@@ -70,6 +70,8 @@ func (w *Window) IsFocused() bool {
 	return true
 }
 
+func (w *Window) SetFocused(f bool) {}
+
 func (w *Window) GetRect() Rect {
 	return Rect{X: w.X, Y: w.Y, Width: w.Width, Height: w.Height}
 }
