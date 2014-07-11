@@ -19,15 +19,33 @@ func RunLoop(callbacks map[string]func(ev *termbox.Event)) {
 		draw()
 	}
 
+	done := make(chan bool)
+	handleEvent := func(event termbox.Event) {
+		switch {
+		case event.Key == termbox.KeyEsc:
+			done <- true
+		default:
+			callbacks["update"](&event)
+		}
+	}
+
+	events := make(chan termbox.Event)
+	go func() {
+		events <- termbox.PollEvent()
+	}()
+
 	for true {
 		termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
-		event := termbox.PollEvent()
-		switch {
-		case event.Key == termbox.KeyEsc:
+		var event termbox.Event
+		select {
+		case event = <-events:
+			termbox.SetCell(0, 10, 'X', termbox.ColorRed, termbox.ColorRed)
+			handleEvent(event)
+		case <-done:
 			break
 		default:
-			callbacks["update"](&event)
+			// Just keep going
 		}
 		draw()
 	}
